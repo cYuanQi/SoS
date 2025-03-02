@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadows of Silence - Interactive Story</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #222;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        #game-container {
+            max-width: 600px;
+            margin: auto;
+            background: #333;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.2);
+            text-align: left;
+        }
+        button {
+            background: #ff4c4c;
+            color: white;
+            border: none;
+            padding: 10px;
+            margin: 5px 0;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: #cc0000;
+        }
+        .content-warning {
+            background: #660000;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        audio {
+            width: 100%;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <h2>Shadows of Silence</h2>
+        
+        <div class="content-warning">
+            <strong>Content Warning:</strong> This game contains themes of child abuse and neglect. If you or someone you know is in danger, please contact:
+            <br>📞 <strong>Talian Kasih 15999</strong> (Malaysia)
+            <br>📱 WhatsApp: 019-2615999
+        </div>
+
+        <audio controls autoplay loop>
+            <source src="https://your-username.github.io/audio-player/Grief.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>        
+
+        <div id="character-selection">
+            <p><strong>Choose a character to begin:</strong></p>
+            <button onclick="startGame('teacher')">👨‍🏫 The Teacher (Lucas’s Story)</button>
+            <button onclick="startGame('cousin')">👩‍👧 The Cousin (Maya’s Story)</button>
+            <button onclick="startGame('silentcries')">🚨 The Silent Cries (Liyana’s Story)</button>
+        </div>
+
+        <div id="story-container" style="display:none;">
+            <p id="story-text"></p>
+            <div id="choices"></div>
+            <button onclick="restartGame()">🔄 Restart</button>
+        </div>
+    </div>
+
+    <script>
+        let stories = {
+            teacher: {
+                "1": {
+                    text: "Lucas draws a disturbing image of a red door. You ask, 'Do you feel safe at home?' He hesitates, mumbling, 'I’m just clumsy.'",
+                    choices: {
+                        "Ask the school nurse": "2A",
+                        "Ignore it": "Ending_B"
+                    }
+                },
+                "2A": {
+                    text: "The school nurse finds bruises but says, 'Without proof, we can’t do much.' What do you do?",
+                    choices: {
+                        "Document it in secret": "3A",
+                        "Report to principal": "3B"
+                    }
+                },
+                "3A": {
+                    text: "Lucas’s father finds out and threatens legal action. Do you back down?",
+                    choices: {
+                        "Stand your ground": "Ending_A",
+                        "Apologize": "Ending_C"
+                    }
+                },
+                "3B": {
+                    text: "The principal dismisses your concerns as 'exaggeration.' Lucas avoids eye contact with you now. What’s next?",
+                    choices: {
+                        "Speak to Lucas privately": "4A",
+                        "Let it go": "Ending_B"
+                    }
+                },
+                "4A": {
+                    text: "Lucas admits he's scared. 'Dad says if I talk, I’ll end up in foster care.' Do you reassure him?",
+                    choices: {
+                        "Promise secrecy": "Ending_D",
+                        "Encourage him to be honest": "Ending_A"
+                    }
+                },
+                "Ending_A": { text: "✅ GOOD ENDING: You fought for Lucas. CPS intervenes, and he grows up to help others.", choices: {} },
+                "Ending_B": { text: "❌ BAD ENDING: Lucas’s situation worsens. He disappears. Always act when you suspect abuse.", choices: {} },
+                "Ending_C": { text: "❌ BAD ENDING: Lucas loses trust in adults. Your fear allowed injustice.", choices: {} },
+                "Ending_D": { text: "❌ BAD ENDING: Lucas remains silent and trapped in abuse.", choices: {} }
+            },
+
+            cousin: {
+                "1": {
+                    text: "Maya’s stepfather mocks her at dinner. She looks away, forcing a smile. Do you:",
+                    choices: {
+                        "Pull her aside": "2E",
+                        "Laugh awkwardly": "Ending_H"
+                    }
+                },
+                "2E": {
+                    text: "She later texts, 'I hate myself.' Do you:",
+                    choices: {
+                        "Encourage her to speak up": "3E",
+                        "Say 'stay strong'": "Ending_H"
+                    }
+                },
+                "3E": {
+                    text: "Maya confides in you about self-harm. Do you:",
+                    choices: {
+                        "Tell her mom": "Ending_I",
+                        "Help her secretly": "Ending_G"
+                    }
+                },
+                "Ending_G": { text: "✅ GOOD ENDING: Maya seeks therapy and becomes an advocate.", choices: {} },
+                "Ending_H": { text: "❌ BAD ENDING: Maya believes no one cares and falls deeper into depression.", choices: {} },
+                "Ending_I": { text: "❌ BAD ENDING: Her mom dismisses it. Maya loses hope.", choices: {} }
+            },
+
+            silentcries: {
+                "1": {
+                    text: "Liyana is always silent, even when hurt. Her teacher says she 'just needs confidence.' Do you:",
+                    choices: {
+                        "Dig deeper into her history": "2F",
+                        "Accept the teacher's advice": "Ending_J"
+                    }
+                },
+                "2F": {
+                    text: "You find out Liyana lived in multiple foster homes. Do you:",
+                    choices: {
+                        "Talk to her alone": "3F",
+                        "Report it immediately": "Ending_K"
+                    }
+                },
+                "3F": {
+                    text: "She whispers, 'No one believes me.' Do you:",
+                    choices: {
+                        "Encourage her": "Ending_L",
+                        "Say nothing": "Ending_J"
+                    }
+                },
+                "Ending_J": { text: "❌ BAD ENDING: Liyana never speaks out and remains in pain.", choices: {} },
+                "Ending_K": { text: "❌ BAD ENDING: Authorities dismiss your concerns. Liyana stays in an unsafe home.", choices: {} },
+                "Ending_L": { text: "✅ GOOD ENDING: Liyana finally finds a safe home and regains her voice.", choices: {} }
+            }
+        };
+
+        function startGame(role) {
+            currentStory = stories[role];
+            document.getElementById("character-selection").style.display = "none";
+            document.getElementById("story-container").style.display = "block";
+            nextScene("1");
+        }
+
+        function nextScene(chapter) {
+            let scene = currentStory[chapter];
+            document.getElementById("story-text").innerText = scene.text;
+            let choicesDiv = document.getElementById("choices");
+            choicesDiv.innerHTML = "";
+
+            for (let key in scene.choices) {
+                let button = document.createElement("button");
+                button.innerText = key;
+                button.onclick = () => nextScene(scene.choices[key]);
+                choicesDiv.appendChild(button);
+            }
+        }
+
+        function restartGame() {
+            document.getElementById("story-container").style.display = "none";
+            document.getElementById("character-selection").style.display = "block";
+        }
+    </script>
+
+</body>
+</html>
